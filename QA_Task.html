@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <style>
+        /* CSS styling for login form */
+        body {
+            font-family: Arial, sans-serif;
+        }
+        h2, h3 {
+            text-align: center;
+        }
+        .container,
+        textarea {
+            width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            margin-bottom: 20px;
+            margin-right: 20px;
+            flex: 2;
+        }
+        .navButtonsContainer {
+            width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            margin-right: 20px;
+            flex: 2;
+            display: flex;
+            flex-direction: row;"
+        }
+        .containerWrapper {
+            width: 350px;
+            margin: 0 auto;
+            padding: 10px;
+            border: 1px solid white;
+            border-radius: 5px;
+            background-color: white;
+            margin-bottom: 10px;
+        }
+        input[type="text"],
+        input[type="password"],
+        input[type="Name"] {
+            width: 90%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box; /* Include padding in the width */
+        }
+        input[type="button"],
+        .navButton {
+            width: 90%;
+            padding: 10px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        #prevButton {
+            margin-right: 80px;
+        }
+        .error {
+            color: red;
+            font-size: 14px;
+        }
+        #taskPlanner,
+        #taskPlannerTextBox {
+            display: none;
+        }
+        #taskList {
+            margin-top: 20px;
+            padding: 0;
+            list-style-type: none;
+        }
+        #taskList li {
+            margin-bottom: 5px;
+        }
+        .taskContainer {
+            display: flex;
+            align-items: center;
+        }
+        .taskText {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="containerWrapper">
+        <div class="container" id="registrationForm">
+            <h2>Registration Form</h2>
+            <form>
+                <label for="candidateName">Full Name:</label>
+                <input type="text" id="candidateName" name="candidateName" required pattern="\w+\s+\w+">
+                <br>
+                <span class="error" id="errorMsgRegName"></span>
+                <br>
+                <label for="candidateMail">Email:</label>
+                <input type="text" id="candidateMail" name="candidateMail" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" required minlength="4">
+                <br>
+                <span class="error" id="errorMsgRegMail"></span>
+                <input type="button" value="Start" id="startButton" onclick="validateReg()">
+            </form>
+        </div>
+    </div>
+    <div style="display: none;" id="timer" active="false">00:00:00</div>
+    <div class="containerWrapper" style="display: none; flex-direction: column;" id="loginTable">
+        <div class="container">
+            <h3>User Story</h3>
+            <p>Create an automation using Python, that will test both Email/Password fields and ensure that Users can only insert valid data.
+            <br>
+                You'll see either a green "<strong><a style="color: #1fd655;">Valid</a></strong>" message or a red "<strong><a style="color: red;">Invalid</a></strong>" message below each field when you click on the "login" button.
+                Below are the expected "Valid" formats for each field:
+            <br>
+            <br>
+                <strong>Note</strong>: The fields might contain certain bugs that the automation needs to catch.
+            <br>
+                Please submit your project either by sending the files back to the same email OR by creating a public git repo and sharing the link in the email.
+            <br>
+            <strong>Email</strong>
+                <ol>
+                    <li>Email address starts with 1 or more alphanumeric characters (UPPER or lower case), dots, underscores, percentage signs, plus signs, or hyphens before the @</li>
+                    <li>After the @, it matches 1 or more alphanumeric characters, dots, or hyphens.</li>
+                    <li>Has a dot separating the domain name and the TLD (Top Level Domain).</li>
+                    <li>TLD (Top Level Domain) is 2 or more alphabetic characters long.</li>
+                </ol>
+            <br>
+            <strong>Password</strong>
+                <ol>
+                    <li>Is at least 8 characters long.</li>
+                    <li>Contains minimum 1 UPPERCASE letter.</li>
+                    <li>Contains minimum 1 lowercase letter.</li>
+                    <li>Contains at least 1 digit.</li>
+                    <li>Contains at least 1 special character from the set [@$!%*?&].</li>
+                </ol>
+            </p>
+        </div>
+        <div class="container">
+            <h2>Login</h2>
+            <form id="loginForm">
+                <label for="email">Email:</label>
+                <input type="text" id="email" name="email" pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2}$" required minlength="4">
+                <br>
+                <span class="error" id="errorMsgMail"></span>
+                <br>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" pattern="^(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[a-zA-Z\d@$!%*?&]{6,}$" required>
+                <label for="showPassword">Show/Hide</label>
+                <input type="checkbox" id="showPassword" onclick="showHidePassword()">
+                <br>
+                <span class="error" id="errorMsgPwd"></span>
+                <br>
+                <input type="button" value="Login" onclick="validateLogin()">
+            </form>
+        </div>
+    </div>
+    <div class="containerWrapper" style="display: flex; flex-direction: column;">
+        <div class="container" id="taskPlannerTextBox" style="display: none;">
+            <h3>User Story</h3>
+            <p>
+                Our Call Center Management has received several reports about an error occurring in the Task Planner App.
+                <br>
+                <br>
+                <strong>Here is the report:</strong>
+                <br>
+                An error message pops up when I try to delete a task sometimes.
+                <br>
+                It happens randomly and prevents us from deleting tasks that have been completed.
+                <br>
+                <br>
+                <strong>Task</strong>:
+                <br>
+                Find the error and write a clear bug report to the Development Team explaining in which exact cases the error appears to ensure we fix this issue once and for all.
+                <br>
+                Insert your report in a <strong>TEXT</strong> file and attach it to the email you're going to send.
+            </p>
+        </div>
+        <div class="container" id="taskPlanner" style="display: none;">
+            <h2>Task Planner</h2>
+            <ul id="taskList">
+                <li>
+                    <div class="taskContainer">
+                        <span class="taskText">Task 1</span>
+                        <button onclick="deleteTask(this)">Delete</button>
+                    </div>
+                </li>
+                <li>
+                    <div class="taskContainer">
+                        <span class="taskText">Task 2</span>
+                        <button onclick="deleteTask(this)">Delete</button>
+                    </div>
+                </li>
+                <li>
+                    <div class="taskContainer">
+                        <span class="taskText">Task 3</span>
+                        <button onclick="deleteTask(this)">Delete</button>
+                    </div>
+                </li>
+            </ul>
+            <input type="text" id="newTask" placeholder="Enter task">
+            <button onclick="addTask()">Add Task</button>
+        </div>
+    </div>
+    <div class="containerWrapper" style="text-align: center;">
+        <div class="navButtonsContainer">
+            <button class="navButton" id="prevButton" style="display: none;" pageNum="1" onclick="prev()">Previous</button>
+            <button class="navButton" id="nextButton" style="display: none;" pageNum="1" onclick="next()">Next</button>
+        </div>
+    </div>
+    <div class="containerWrapper" style="display: flex; flex-direction: column; text-align: center;">
+        <h1 style="display: none;" id="tyMsg">Thank you for your time!</h1>
+        <p style="display: none;" id="tyTxt">
+            Please reply to our HR Team with the results.
+            <br>
+            Looking forward to seeing your great work! :)
+        </p>
+    </div>
+
+    <script>
+        function finish() {
+            var currentTime = new Date().toLocaleString("en-US", { timeZone: "Europe/Moscow" });
+            var uName = document.getElementById('uName').value;
+            var uMail = document.getElementById('uMail').value;
+            var nextButton = document.getElementById('nextButton');
+            var prevButton = document.getElementById('prevButton');
+            var taskPlanner = document.getElementById("taskPlanner");
+            var taskPlannerTextBox = document.getElementById("taskPlannerTextBox");
+            var finalMsg = document.getElementById('tyMsg');
+            var finalTxt = document.getElementById('tyTxt');
+
+                // Constructing the data payload
+                var data = {
+                    name: uName,
+                    email: uMail,
+                    time: currentTime,
+                    EventName: "End"
+                };
+
+                // Sending data to the webhook URL
+                fetch('https://hook.us1.make.com/d8abuoftoi9hyrstcedxvjp4eqr8tps6', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Data sent successfully:', data);
+                })
+                .catch(error => {
+                    console.error('There was a problem with the fetch operation:', error);
+                });
+
+                taskPlanner.style.display = "none";
+                taskPlannerTextBox.style.display = "none";
+                nextButton.style.display = "none";
+                prevButton.style.display = "none";
+                finalMsg.style.display = "block";
+                finalTxt.style.display = "block";
+        }
+
+        function next() {
+            var nextButton = document.getElementById('nextButton');
+            var prevButton = document.getElementById('prevButton');
+            var taskPlanner = document.getElementById("taskPlanner");
+            var taskPlannerTextBox = document.getElementById("taskPlannerTextBox");
+            var loginTable = document.getElementById("loginTable");
+
+            if (nextButton.getAttribute('pageNum') === '1') {
+                nextButton.setAttribute('pageNum', '2');
+                prevButton.setAttribute('pageNum', '2');
+                taskPlanner.style.display = "block";
+                taskPlannerTextBox.style.display = "block";
+                loginTable.style.display = "none";
+                nextButton.textContent = 'Finish';
+                nextButton.onclick = finish;
+            }
+        }
+
+        function prev() {
+            var nextButton = document.getElementById('nextButton');
+            var prevButton = document.getElementById('prevButton');
+            var taskPlanner = document.getElementById("taskPlanner");
+            var taskPlannerTextBox = document.getElementById("taskPlannerTextBox");
+            var loginTable = document.getElementById("loginTable");
+
+            if (prevButton.getAttribute('pageNum') === '2') {
+                nextButton.setAttribute('pageNum', '1');
+                prevButton.setAttribute('pageNum', '1');
+                taskPlanner.style.display = "none";
+                taskPlannerTextBox.style.display = "none";
+                loginTable.style.display = "block";
+                nextButton.textContent = 'Next';
+                nextButton.onclick = next;
+            }
+        }
+
+        // Validation for Registration Form
+        function validateReg() {
+            var canMail = document.getElementById("candidateMail").value;
+            var canName = document.getElementById("candidateName").value;
+            var errorMsgRegMail = document.getElementById("errorMsgRegMail");
+            var errorMsgRegName = document.getElementById("errorMsgRegName");
+            var patternMail = new RegExp(document.getElementById("candidateMail").getAttribute('pattern'));
+            var patternName = new RegExp(document.getElementById("candidateName").getAttribute('pattern'));
+            var regForm = document.getElementById('registrationForm');
+            var login = document.getElementById('loginTable');
+            var nextButton = document.getElementById('nextButton');
+            var prevButton = document.getElementById('prevButton');
+
+            if (!patternMail.test(canMail)) {
+                errorMsgRegMail.textContent = "Please enter a valid email";
+            } else if (!patternName.test(canName)) {
+                errorMsgRegName.textContent = "Please type your full name";
+            } else {
+                errorMsgRegMail.textContent = "";
+                errorMsgRegName.textContent = "";
+                regForm.style.display = "none";
+                login.style.display = "flex";
+                nextButton.style.display = "block";
+                prevButton.style.display = "block";
+                var currentTime = new Date().toLocaleString("en-US", { timeZone: "Europe/Moscow" });
+
+                var data = {
+                    name: canName,
+                    email: canMail,
+                    time: currentTime,
+                    EventName: "Start"
+                };
+
+                fetch('https://hook.us1.make.com/d8abuoftoi9hyrstcedxvjp4eqr8tps6', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Data sent successfully:', data);
+                })
+                .catch(error => {
+                    console.error('There was a problem with the fetch operation:', error);
+                });
+
+                var hiddenEmailInput = document.createElement("input");
+                hiddenEmailInput.type = "hidden";
+                hiddenEmailInput.id = "uMail";
+                hiddenEmailInput.name = "hiddenEmail";
+                hiddenEmailInput.value = canMail;
+
+                var hiddenNameInput = document.createElement("input");
+                hiddenNameInput.type = "hidden";
+                hiddenNameInput.id = "uName";
+                hiddenNameInput.name = "hiddenName";
+                hiddenNameInput.value = canName;
+
+                document.getElementById("registrationForm").appendChild(hiddenEmailInput);
+                document.getElementById("registrationForm").appendChild(hiddenNameInput);
+            }
+        }
+
+        // Timer functionality
+        let timerInterval;
+        let startTime;
+
+        function startTimer() {
+            var timer = document.getElementById('timer');
+            var isActivated = timer.getAttribute('active');
+
+            if (isActivated === "false") {
+                startTime = new Date().getTime();
+                timer.setAttribute('active', 'true');
+                timerInterval = setInterval(updateTimer, 1000);
+            }
+        }
+
+        function updateTimer() {
+            const currentTime = new Date().getTime();
+            const elapsedTime = currentTime - startTime;
+
+            const hours = Math.floor(elapsedTime / (1000 * 60 * 60));
+            const minutes = Math.floor((elapsedTime % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((elapsedTime % (1000 * 60)) / 1000);
+
+            const formattedTime = padNumber(hours) + ":" + padNumber(minutes) + ":" + padNumber(seconds);
+
+            document.getElementById('timer').innerText = formattedTime;
+        }
+
+        function padNumber(number) {
+            return (number < 10 ? '0' : '') + number;
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+        }
+
+        // Event listeners for timer
+        document.getElementById('startButton').addEventListener('click', startTimer);
+
+
+        // Show/Hide password functionality
+        function showHidePassword() {
+            var password = document.getElementById("password");
+            password.type = (password.type === "password") ? "text" : "password";
+        }
+
+        // Login form validation
+        function validateLogin() {
+            var email = document.getElementById("email").value;
+            var emailPattern = document.getElementById("email").getAttribute('pattern');
+            var password = document.getElementById("password").value;
+            var passwordPattern = document.getElementById("password").getAttribute('pattern');
+            var errorMsgMail = document.getElementById("errorMsgMail");
+            var errorMsgPwd = document.getElementById("errorMsgPwd");
+
+            var emailRegex = new RegExp(emailPattern);
+            var passwordRegex = new RegExp(passwordPattern);
+
+            if (!emailRegex.test(email) && !passwordRegex.test(password)) {
+                errorMsgMail.textContent = "Invalid email";
+                errorMsgMail.style.color = "red";
+                errorMsgPwd.textContent = "Invalid Password";
+                errorMsgPwd.style.color = "red";
+            } else if (!emailRegex.test(email) && passwordRegex.test(password)) {
+                errorMsgMail.textContent = "Invalid email";
+                errorMsgMail.style.color = "red";
+                errorMsgPwd.style.color = "green";
+                errorMsgMail.textContent = "Valid Password";
+            } else if (emailRegex.test(email) && !passwordRegex.test(password)) {
+                errorMsgMail.textContent = "Vaild Email";
+                errorMsgMail.style.color = "green";
+                errorMsgPwd.textContent = "Invalid Password";
+                errorMsgPwd.style.color = "red";
+            } else if (emailRegex.test(email) && passwordRegex.test(password)) {
+                errorMsgMail.textContent = "Valid Email";
+                errorMsgMail.style.color = "green";
+                errorMsgPwd.textContent = "Valid Password";
+                errorMsgPwd.style.color = "green";
+            }
+        }
+
+
+
+        // Task Planner functionality
+        function addTask() {
+            var newTaskInput = document.getElementById("newTask");
+            var taskList = document.getElementById("taskList");
+            var newTaskText = newTaskInput.value.trim();
+
+            if (newTaskText) {
+                var li = document.createElement("li");
+                li.textContent = newTaskText;
+                var deleteButton = document.createElement("button");
+                deleteButton.textContent = "Delete";
+                deleteButton.onclick = function() { deleteTask(this); };
+                li.appendChild(deleteButton);
+                taskList.appendChild(li);
+                newTaskInput.value = "";
+            }
+        }
+
+        function deleteTask(button) {
+            var li = button.parentNode;
+            var index = Array.prototype.indexOf.call(li.parentNode.children, li);
+            if ((index + 1) % 3 === 0) {
+                alert("An exception occurred while deleting this task.");
+            } else {
+                li.parentNode.removeChild(li);
+            }
+        }
+        function sendDataToWebhook() {
+            var candidateName = document.getElementById("candidateName").value;
+            var candidateMail = document.getElementById("candidateMail").value;
+            var currentTime = new Date().toLocaleString("en-US", { timeZone: "GMT+3" });
+
+            // Constructing the data payload
+            var data = {
+                name: candidateName,
+                email: candidateMail,
+                time: currentTime
+            };
+
+            fetch('https://hook.us1.make.com/d8abuoftoi9hyrstcedxvjp4eqr8tps6', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Data sent successfully:', data);
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+            });
+        }
+    </script>
+</body>
+</html>
